@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.SeckillTasksMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.SeckillTasks">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+    <result column="stock" jdbcType="BIGINT" property="stock" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="status" jdbcType="OTHER" property="status" />
+  </resultMap>
+
+  <resultMap id="TaskPOResultMap" type="com.ly.po.TaskPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="status" jdbcType="OTHER" property="status" />
+    <result column="stock" jdbcType="INTEGER" property="store" />
+    <result column="capacity" jdbcType="INTEGER" property="capacity" />
+    <result column="remain" jdbcType="INTEGER" property="remain" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode" />
+    <result column="college" jdbcType="VARCHAR" property="college" />
+    <result column="semester" jdbcType="VARCHAR" property="semester" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacherName" />
+    <result column="tno" jdbcType="BIGINT" property="tno" />
+  </resultMap>
+
+  <resultMap id="TaskCoursePOResultMap" type="com.ly.po.TaskCoursePO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="status" jdbcType="OTHER" property="status" />
+    <result column="stock" jdbcType="INTEGER" property="store" />
+    <result column="capacity" jdbcType="INTEGER" property="capacity" />
+    <result column="remain" jdbcType="INTEGER" property="remain" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode" />
+    <result column="college" jdbcType="VARCHAR" property="college" />
+    <result column="semester" jdbcType="VARCHAR" property="semester" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacherName" />
+    <result column="tno" jdbcType="BIGINT" property="tno" />
+
+    <result column="credit" jdbcType="DOUBLE" property="credit" />
+    <result column="course_type" jdbcType="VARCHAR" property="courseType" />
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+    <result column="class_time" jdbcType="VARCHAR" property="classTime" />
+    <result column="class_location" jdbcType="VARCHAR" property="classLocation" />
+    <result column="week_range" jdbcType="VARCHAR" property="weekRange" />
+    <result column="pre_course_code" jdbcType="VARCHAR" property="preCourseCode" />
+
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, course_id, stock, start_time, end_time, `status`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from seckill_tasks
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectTask" resultMap="TaskPOResultMap">
+    SELECT
+        sk.id,
+        sk.start_time,
+        sk.end_time,
+        sk.status,
+        sk.stock,
+        c.capacity,
+        c.remain,
+        c.name,
+        c.course_code,
+        c.college,
+        c.semester,
+        t.name as teacher_name,
+        t.tno
+    FROM
+      seckill_tasks sk LEFT JOIN courses c ON sk.course_id = c.id
+                       LEFT JOIN teachers t ON c.teacher_id = t.id
+  </select>
+
+  <select id="searchTask" resultMap="TaskPOResultMap">
+    SELECT
+      sk.id,
+      sk.start_time,
+      sk.end_time,
+      sk.status,
+      sk.stock,
+      c.capacity,
+      c.remain,
+      c.name,
+      c.course_code,
+      c.college,
+      c.semester,
+      t.name as teacher_name,
+      t.tno
+    FROM
+      seckill_tasks sk LEFT JOIN courses c ON sk.course_id = c.id
+                       LEFT JOIN teachers t ON c.teacher_id = t.id
+    WHERE c.name LIKE CONCAT ('%', #{searchText}, '%')
+  </select>
+
+  <select id="selectAllTask" resultMap="TaskCoursePOResultMap">
+    SELECT
+      sk.id,
+      sk.start_time,
+      sk.end_time,
+      sk.status,
+      sk.stock,
+      c.capacity,
+      c.remain,
+      c.name,
+      c.course_code,
+      c.college,
+      c.semester,
+      t.name as teacher_name,
+      t.tno,
+
+      c.credit,
+      c.course_type,
+      c.description,
+      c.class_time,
+      c.class_location,
+      c.week_range,
+      c2.course_code as pre_course_code
+    FROM
+      seckill_tasks sk LEFT JOIN courses c ON sk.course_id = c.id
+                       LEFT JOIN teachers t ON c.teacher_id = t.id
+                        LEFT JOIN courses c2 ON c.pre_course = c2.id
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+        *
+    from
+        seckill_tasks
+  </select>
+  <select id="selectList" resultMap="BaseResultMap">
+    select *
+    from
+        seckill_tasks
+  </select>
+    <select id="selectNotStarted" resultMap="BaseResultMap">
+      select *
+      from
+        seckill_tasks
+      WHERE
+          status = 'NOT_STARTED'
+    </select>
+  <select id="selectOnGoing" resultType="com.ly.pojo.SeckillTasks">
+    select *
+    from
+      seckill_tasks
+    WHERE
+      status = 'ONGOING'
+  </select>
+  <select id="selectEndTimeByCourseId" resultType="java.util.Date">
+    SELECT
+      end_time
+    FROM
+      seckill_tasks
+    WHERE
+      course_id = #{courseId}
+  </select>
+  <select id="selectStartTimeByCourseId" resultType="java.util.Date">
+        SELECT
+            start_time
+        FROM
+          seckill_tasks
+        WHERE
+            course_id = #{courseId}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from seckill_tasks
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByCourseId">
+    delete from seckill_tasks
+    where course_id = #{id}
+
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.SeckillTasks" useGeneratedKeys="true">
+    insert into seckill_tasks (course_id, stock, start_time, 
+      end_time, `status`)
+    values (#{courseId,jdbcType=INTEGER}, #{stock,jdbcType=BIGINT}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{status})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.SeckillTasks" useGeneratedKeys="true">
+    insert into seckill_tasks
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="courseId != null">
+        course_id,
+      </if>
+      <if test="stock != null">
+        stock,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="courseId != null">
+        #{courseId,jdbcType=INTEGER},
+      </if>
+      <if test="stock != null">
+        #{stock,jdbcType=BIGINT},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=OTHER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.SeckillTasks">
+    update seckill_tasks
+    <set>
+      <if test="courseId != null">
+        course_id = #{courseId,jdbcType=INTEGER},
+      </if>
+      <if test="stock != null">
+        stock = #{stock,jdbcType=BIGINT},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=OTHER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.SeckillTasks">
+    update seckill_tasks
+    set
+      stock = #{stock,jdbcType=BIGINT},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      `status` = #{status,jdbcType=OTHER}
+    where course_id = #{courseId,jdbcType=INTEGER}
+  </update>
+    <update id="updateAllByPrimaryKeyPO" parameterType="com.ly.po.TaskPO">
+      update students
+      set
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+        `status` = #{status,jdbcType=OTHER},
+        stock = #{store}
+      where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateStatus">
+      update seckill_tasks
+      set status = #{status}
+      where course_id = #{courseId}
+    </update>
+    <update id="updateStockBycourseId">
+      update seckill_tasks
+      set stock = stock - 1
+      where course_id = #{courseId}
+    </update>
+    <update id="updateStockBycourseIdAdd">
+      update seckill_tasks
+      set stock = stock + 1
+      where course_id = #{courseId}
+    </update>
+</mapper>

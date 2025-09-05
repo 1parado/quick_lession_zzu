@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.UsersMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Users">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="account" jdbcType="BIGINT" property="account" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="role" jdbcType="OTHER" property="role" />
+    <result column="is_active" jdbcType="INTEGER" property="isActive" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, account, `password`, `role`, is_active
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from users
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByAccount" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    *
+    from users
+    where account = #{account}
+  </select>
+
+  <select id="selectIdByAccount" parameterType="java.lang.Long" resultType="integer">
+    select
+      id
+    from users
+    where account = #{account}
+      LIMIT  1
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from users
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteByAccount" parameterType="java.lang.Long">
+    delete from users
+    where account = #{sno}
+  </delete>
+
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Users" useGeneratedKeys="true">
+    insert into users (account, `password`, `role`, 
+      is_active)
+    values (#{account,jdbcType=BIGINT}, #{password,jdbcType=VARCHAR}, #{role,jdbcType=OTHER}, 
+      #{isActive,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Users" useGeneratedKeys="true">
+    insert into users
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="account != null">
+        account,
+      </if>
+      <if test="password != null">
+        `password`,
+      </if>
+      <if test="role != null">
+        `role`,
+      </if>
+      <if test="isActive != null">
+        is_active,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="account != null">
+        #{account,jdbcType=BIGINT},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        #{role,jdbcType=OTHER},
+      </if>
+      <if test="isActive != null">
+        #{isActive,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Users">
+    update users
+    <set>
+      <if test="account != null">
+        account = #{account,jdbcType=BIGINT},
+      </if>
+      <if test="password != null">
+        `password` = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        `role` = #{role,jdbcType=OTHER},
+      </if>
+      <if test="isActive != null">
+        is_active = #{isActive,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey">
+    update users
+    set account = #{account,jdbcType=BIGINT},
+        `password` = #{password,jdbcType=VARCHAR},
+        `role` = #{role,jdbcType=OTHER},
+        is_active = #{isActive,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByAccountAndPasswordById" parameterType="com.ly.pojo.Users">
+    update users
+    set account = #{sno},
+        `password` = #{sno}
+    where id = #{userId}
+  </update>
+
+  <update id="updatePasswordByAccount">
+    update users
+    set
+        `password` = #{password}
+    where account = #{account}
+  </update>
+</mapper>

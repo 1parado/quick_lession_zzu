@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.PreSelectionMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.PreSelection">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_id" jdbcType="INTEGER" property="studentId" />
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, student_id, course_code
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from pre_selection
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectStudentIdsByCourse" resultType="java.lang.Integer">
+        SELECT student_id
+        FROM pre_selection
+        WHERE course_code = #{courseCode}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from pre_selection
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByStudentId">
+      delete from pre_selection
+      where student_id = #{studentId}
+
+    </delete>
+  <delete id="deleteByStudentIdAndCourseCode">
+    delete from pre_selection
+    where student_id = #{studentId}
+    AND
+        course_code = #{courseCode}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.PreSelection" useGeneratedKeys="true">
+    insert into pre_selection (student_id, course_code)
+    values (#{studentId,jdbcType=INTEGER}, #{courseCode,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.PreSelection" useGeneratedKeys="true">
+    insert into pre_selection
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="studentId != null">
+        student_id,
+      </if>
+      <if test="courseCode != null">
+        course_code,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="studentId != null">
+        #{studentId,jdbcType=INTEGER},
+      </if>
+      <if test="courseCode != null">
+        #{courseCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.PreSelection">
+    update pre_selection
+    <set>
+      <if test="studentId != null">
+        student_id = #{studentId,jdbcType=INTEGER},
+      </if>
+      <if test="courseCode != null">
+        course_code = #{courseCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.PreSelection">
+    update pre_selection
+    set student_id = #{studentId,jdbcType=INTEGER},
+      course_code = #{courseCode,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

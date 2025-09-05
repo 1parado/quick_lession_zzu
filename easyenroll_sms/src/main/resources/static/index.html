@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短信监控系统</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .time-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .time-btn {
+            padding: 12px 25px;
+            background-color: #fff;
+            border: 2px solid #2575fc;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #2575fc;
+        }
+
+        .time-btn.active {
+            background-color: #2575fc;
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
+        }
+
+        .time-btn:hover:not(.active) {
+            background-color: #f0f5ff;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .total {
+            border-top: 5px solid #6a11cb;
+        }
+
+        .sending {
+            border-top: 5px solid #ff9800;
+        }
+
+        .success {
+            border-top: 5px solid #4caf50;
+        }
+
+        .failed {
+            border-top: 5px solid #f44336;
+        }
+
+        .stat-title {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-desc {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .percentage {
+            font-size: 1rem;
+            margin-left: 5px;
+            color: #666;
+        }
+
+        .chart-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 12px 30px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
+        }
+
+        .refresh-btn:hover {
+            background-color: #1c64e0;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .error-message a {
+            color: #d32f2f;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .canvas-container {
+            position: relative;
+            height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .time-selector {
+                flex-wrap: wrap;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>短信监控系统</h1>
+        <p class="description">实时监控短信发送状态与统计数据</p>
+    </header>
+
+    <div class="time-selector">
+        <button class="time-btn active" data-range="today">今日统计</button>
+        <button class="time-btn" data-range="week">本周统计</button>
+        <button class="time-btn" data-range="all">全部统计</button>
+    </div>
+
+    <div class="last-updated">最后更新: <span id="update-time">--</span></div>
+
+    <div id="data-error" class="error-message" style="display: none;">
+        数据加载失败，请检查网络连接并<a onclick="fetchSmsData()">重试</a>。
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card total">
+            <div class="stat-title">短信总数</div>
+            <div class="stat-value" id="total-count">0</div>
+            <div class="stat-desc">所有状态的短信数量总和</div>
+        </div>
+
+        <div class="stat-card sending">
+            <div class="stat-title">发送中</div>
+            <div class="stat-value" id="sending-count">0</div>
+            <div class="stat-desc">等待发送或正在发送的短信</div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-title">发送成功</div>
+            <div class="stat-value" id="success-count">0</div>
+            <div class="stat-desc">已成功发送的短信</div>
+        </div>
+
+        <div class="stat-card failed">
+            <div class="stat-title">发送失败</div>
+            <div class="stat-value" id="failed-count">0</div>
+            <div class="stat-desc">发送失败的短信</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h2 class="chart-title">短信状态分布</h2>
+        <div id="chart-loading" class="loading">
+            <div class="spinner"></div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="sms-chart"></canvas>
+        </div>
+    </div>
+
+    <button class="refresh-btn" id="refresh-btn">刷新数据</button>
+</div>
+
+<script>
+    // 简化的Chart实现（仅包含所需功能）
+    class SimpleChart {
+        constructor(ctx, config) {
+            this.ctx = ctx;
+            this.config = config;
+            this.canvas = ctx.canvas;
+
+            // 设置canvas尺寸
+            this.canvas.width = this.canvas.offsetWidth;
+            this.canvas.height = this.canvas.offsetHeight;
+
+            this.draw();
+        }
+
+        draw() {
+            const { type, data, options } = this.config;
+
+            if (type === 'doughnut') {
+                this.drawDoughnut(data, options);
+            }
+        }
+
+        drawDoughnut(data, options) {
+            const ctx = this.ctx;
+            const centerX = this.canvas.width / 2;
+            const centerY = this.canvas.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.6;
+            const cutoutRadius = radius * 0.65;
+
+            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+            let startAngle = -Math.PI / 2; // 从顶部开始
+
+            // 绘制饼图段
+            data.datasets[0].data.forEach((value, i) => {
+                const sliceAngle = (value / total) * 2 * Math.PI;
+
+                ctx.beginPath();
+                ctx.fillStyle = data.datasets[0].backgroundColor[i];
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fill();
+
+                startAngle += sliceAngle;
+            });
+
+            // 绘制中心孔（实现环形图效果）
+            ctx.beginPath();
+            ctx.fillStyle = 'white';
+            ctx.arc(centerX, centerY, cutoutRadius, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // 绘制图例
+            if (options.plugins && options.plugins.legend && options.plugins.legend.position === 'bottom') {
+                this.drawLegend(data, centerX, centerY + radius + 40);
+            }
+
+            // 绘制中心文本
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`总计: ${total}`, centerX, centerY);
+        }
+
+        drawLegend(data, centerX, startY) {
+            const ctx = this.ctx;
+            const legendItemHeight = 25;
+            const totalWidth = data.labels.length * 120;
+            let startX = centerX - totalWidth / 2;
+
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'left';
+
+            data.labels.forEach((label, i) => {
+                // 绘制颜色方块
+                ctx.fillStyle = data.datasets[0].backgroundColor[i];
+                ctx.fillRect(startX, startY, 15, 15);
+
+                // 绘制文本
+                ctx.fillStyle = '#333';
+                ctx.fillText(label, startX + 25, startY + 12);
+
+                startX += 120;
+            });
+        }
+
+        destroy() {
+            // 清除canvas
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+
+    // 全局变量
+    let smsData = [];
+    let currentRange = 'today';
+    let smsChart = null;
+
+    // DOM元素
+    const totalCountEl = document.getElementById('total-count');
+    const sendingCountEl = document.getElementById('sending-count');
+    const successCountEl = document.getElementById('success-count');
+    const failedCountEl = document.getElementById('failed-count');
+    const updateTimeEl = document.getElementById('update-time');
+    const refreshBtn = document.getElementById('refresh-btn');
+    const timeButtons = document.querySelectorAll('.time-btn');
+    const chartLoadingEl = document.getElementById('chart-loading');
+    const dataErrorEl = document.getElementById('data-error');
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取数据
+        fetchSmsData();
+
+        // 添加时间范围选择事件监听
+        timeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                timeButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentRange = this.dataset.range;
+                updateStatistics();
+            });
+        });
+
+        // 添加刷新按钮事件监听
+        refreshBtn.addEventListener('click', fetchSmsData);
+    });
+
+    // 获取短信数据
+    function fetchSmsData() {
+        dataErrorEl.style.display = 'none';
+        chartLoadingEl.style.display = 'flex';
+
+        axios.get('/sms/sms')
+            .then(function (response) {
+                smsData = response.data.data || [];
+                updateStatistics();
+                updateLastUpdatedTime();
+                chartLoadingEl.style.display = 'none';
+            })
+            .catch(function (error) {
+                console.error('获取短信数据失败:', error);
+                dataErrorEl.style.display = 'block';
+                chartLoadingEl.style.display = 'none';
+            });
+    }
+
+    // 更新统计信息
+    function updateStatistics() {
+        // 根据当前选择的时间范围过滤数据
+        const filteredData = filterDataByRange(smsData, currentRange);
+
+        // 计算各状态的数量
+        const sendingCount = filteredData.filter(sms => sms.status === 0).length;
+        const successCount = filteredData.filter(sms => sms.status === 1 || sms.status === 3).length;
+        const failedCount = filteredData.filter(sms => sms.status === 2).length;
+        const totalCount = sendingCount + successCount + failedCount;
+
+        // 更新DOM
+        totalCountEl.textContent = totalCount;
+        sendingCountEl.textContent = sendingCount;
+        successCountEl.textContent = successCount;
+        failedCountEl.textContent = failedCount;
+
+        // 更新图表
+        updateChart(sendingCount, successCount, failedCount);
+    }
+
+    // 根据时间范围过滤数据
+    function filterDataByRange(data, range) {
+        const now = new Date();
+
+        switch(range) {
+            case 'today':
+                const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                return data.filter(sms => new Date(sms.datesend) >= todayStart);
+
+            case 'week':
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                return data.filter(sms => new Date(sms.datesend) >= weekStart);
+
+            case 'all':
+            default:
+                return data;
+        }
+    }
+
+    // 更新图表
+    function updateChart(sending, success, failed) {
+        const ctx = document.getElementById('sms-chart').getContext('2d');
+
+        // 如果已有图表实例，先销毁
+        if (smsChart) {
+            smsChart.destroy();
+        }
+
+        // 创建新图表
+        try {
+            smsChart = new SimpleChart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['发送中', '发送成功', '发送失败'],
+                    datasets: [{
+                        data: [sending, success, failed],
+                        backgroundColor: [
+                            '#ff9800',
+                            '#4caf50',
+                            '#f44336'
+                        ]
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('创建图表失败:', error);
+        }
+    }
+
+    // 更新最后刷新时间
+    function updateLastUpdatedTime() {
+        const now = new Date();
+        updateTimeEl.textContent = now.toLocaleTimeString();
+    }
+</script>
+</body>
+</html>

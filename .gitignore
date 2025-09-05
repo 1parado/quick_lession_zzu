@@ -1,0 +1,74 @@
+# Node.js 依赖目录
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 前端构建输出目录
+dist/
+build/
+.parcel-cache/
+.vite/
+
+# 环境变量文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 大型数据文件
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# 视频和大型媒体文件
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+
+# 虚拟机和容器文件
+*.vdi
+*.vmdk
+*.ova
+*.ovf
+
+# 备份文件
+*.bak
+*.backup
+
+# AI模型文件（你的项目可能有很多大模型文件）
+*.bin
+*.h5
+*.pth
+*.pt
+*.joblib
+*.pkl
+
+# 日志文件
+*.log
+logs/
+
+
+# 运行时数据
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# 覆盖率目录
+coverage/
+.nyc_output/
+
+# 依赖目录（确保所有项目的都忽略）
+*/node_modules/

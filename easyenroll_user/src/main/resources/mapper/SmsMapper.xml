@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.easyenroll_user.mapper.SmsMapper">
+  <resultMap id="BaseResultMap" type="com.ly.easyenroll_user.pojo.Sms">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="thread_id" jdbcType="BIGINT" property="threadId" />
+    <result column="sender" jdbcType="BIGINT" property="sender" />
+    <result column="receiver" jdbcType="BIGINT" property="receiver" />
+    <result column="subject" jdbcType="VARCHAR" property="subject" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="dateSend" jdbcType="TIMESTAMP" property="datesend" />
+    <result column="dateReceive" jdbcType="TIMESTAMP" property="datereceive" />
+    <result column="read" jdbcType="INTEGER" property="read" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, thread_id, sender, receiver, subject, `type`, `status`, dateSend, dateReceive, 
+    `read`, content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sms
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+        sms
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sms
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.easyenroll_user.pojo.Sms" useGeneratedKeys="true">
+    insert into sms (thread_id, sender, receiver, 
+      subject, `type`, `status`, 
+      dateSend, dateReceive, `read`, 
+      content)
+    values (#{threadId,jdbcType=BIGINT}, #{sender,jdbcType=BIGINT}, #{receiver,jdbcType=BIGINT}, 
+      #{subject,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{datesend,jdbcType=TIMESTAMP}, #{datereceive,jdbcType=TIMESTAMP}, #{read,jdbcType=INTEGER}, 
+      #{content,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.easyenroll_user.pojo.Sms" useGeneratedKeys="true">
+    insert into sms
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="threadId != null">
+        thread_id,
+      </if>
+      <if test="sender != null">
+        sender,
+      </if>
+      <if test="receiver != null">
+        receiver,
+      </if>
+      <if test="subject != null">
+        subject,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="datesend != null">
+        dateSend,
+      </if>
+      <if test="datereceive != null">
+        dateReceive,
+      </if>
+      <if test="read != null">
+        `read`,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="threadId != null">
+        #{threadId,jdbcType=BIGINT},
+      </if>
+      <if test="sender != null">
+        #{sender,jdbcType=BIGINT},
+      </if>
+      <if test="receiver != null">
+        #{receiver,jdbcType=BIGINT},
+      </if>
+      <if test="subject != null">
+        #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="datesend != null">
+        #{datesend,jdbcType=TIMESTAMP},
+      </if>
+      <if test="datereceive != null">
+        #{datereceive,jdbcType=TIMESTAMP},
+      </if>
+      <if test="read != null">
+        #{read,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.easyenroll_user.pojo.Sms">
+    update sms
+    <set>
+      <if test="threadId != null">
+        thread_id = #{threadId,jdbcType=BIGINT},
+      </if>
+      <if test="sender != null">
+        sender = #{sender,jdbcType=BIGINT},
+      </if>
+      <if test="receiver != null">
+        receiver = #{receiver,jdbcType=BIGINT},
+      </if>
+      <if test="subject != null">
+        subject = #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="datesend != null">
+        dateSend = #{datesend,jdbcType=TIMESTAMP},
+      </if>
+      <if test="datereceive != null">
+        dateReceive = #{datereceive,jdbcType=TIMESTAMP},
+      </if>
+      <if test="read != null">
+        `read` = #{read,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.easyenroll_user.pojo.Sms">
+    update sms
+    set thread_id = #{threadId,jdbcType=BIGINT},
+      sender = #{sender,jdbcType=BIGINT},
+      receiver = #{receiver,jdbcType=BIGINT},
+      subject = #{subject,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=INTEGER},
+      `status` = #{status,jdbcType=INTEGER},
+      dateSend = #{datesend,jdbcType=TIMESTAMP},
+      dateReceive = #{datereceive,jdbcType=TIMESTAMP},
+      `read` = #{read,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateRead">
+    UPDATE
+        sms
+    SET
+      `read` = 1
+    WHERE
+      `id` = #{id}
+  </update>
+</mapper>

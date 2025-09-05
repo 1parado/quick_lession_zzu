@@ -1,0 +1,19 @@
+package com.ly.annotation;
+
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target({ElementType.METHOD,ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RoleRequire {
+    String[] value();
+    /*
+       STUDENT,
+       TEACHER,
+       ADMIN
+
+     */
+}

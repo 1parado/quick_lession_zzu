@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短信管理系统</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .phone-mockup {
+            width: 360px;
+            height: 700px;
+            background: #121212;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #333;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f0f0f0;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            height: 25px;
+            background: #000;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 12px;
+        }
+
+        .header {
+            height: 60px;
+            background: #128C7E;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            background: #e5ddd5;
+            position: relative;
+        }
+
+        .sms-list {
+            padding: 10px;
+        }
+
+        .sms-item {
+            background: white;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .sms-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .sms-item.unread {
+            background: #dcf8c6;
+            border-left: 4px solid #25d366;
+        }
+
+        .sender {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .message-preview {
+            color: #555;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+
+        .time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .unread-badge {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ff3b30;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+
+        .sms-detail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e5ddd5;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+        }
+
+        .detail-header {
+            height: 60px;
+            background: #128C7E;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 10px;
+        }
+
+        .detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .received {
+            background: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .sent {
+            background: #dcf8c6;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            margin-left: auto;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .detail-footer {
+            height: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .footer-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: #128C7E;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .user-selector {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            width: 200px;
+            text-align: center;
+        }
+
+        .user-selector option {
+            background: #6a11cb;
+        }
+
+        .notification {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #25d366;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 100;
+            display: none;
+        }
+
+        .notification.error {
+            background: #ff3b30;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #777;
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .time-info {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        .loading i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #128C7E;
+            animation: spin 1s infinite linear;
+        }
+
+        .current-user {
+            margin-top: 10px;
+            color: white;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 style="color: white; margin-bottom: 20px;">短信管理系统</h1>
+
+    <div class="phone-mockup">
+        <div class="phone-screen">
+            <div class="status-bar">
+                <span id="current-time">9:41</span>
+                <span>
+                    <i class="fas fa-signal"></i>
+                    <i class="fas fa-wifi" style="margin-left: 5px;"></i>
+                    <i class="fas fa-battery-full" style="margin-left: 5px;"></i>
+                </span>
+            </div>
+
+            <div class="header">
+                <span>短信</span>
+                <span id="sms-count">0条短信</span>
+            </div>
+
+            <div class="content">
+                <div class="sms-list" id="sms-list">
+                    <div class="empty-state">
+                        <i class="fas fa-comment-slash"></i>
+                        <p>暂无短信</p>
+                    </div>
+                </div>
+
+                <div class="sms-detail" id="sms-detail">
+                    <div class="detail-header">
+                        <button class="back-btn" id="back-btn">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <span id="detail-sender">发送者</span>
+                    </div>
+
+                    <div class="detail-content" id="detail-content">
+                        <div class="loading" id="detail-loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-footer">
+                        <button class="footer-btn" id="delete-btn">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                        <button class="footer-btn" id="mark-read-btn">
+                            <i class="fas fa-check-circle"></i> 标记已读
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <select class="user-selector" id="user-selector">
+        <option value="">-- 选择用户 --</option>
+        <!-- 用户选项将通过JS动态添加 -->
+    </select>
+
+    <div class="current-user" id="current-user-display">
+        当前用户: 15834356385
+    </div>
+
+    <div class="notification" id="notification">操作成功</div>
+</div>
+
+<script>
+    // API基础URL
+    const API_BASE = '';
+    // 默认用户手机号
+    const DEFAULT_PHONE = '15834356385';
+
+    // DOM元素
+    const smsList = document.getElementById('sms-list');
+    const smsDetail = document.getElementById('sms-detail');
+    const detailContent = document.getElementById('detail-content');
+    const detailSender = document.getElementById('detail-sender');
+    const backBtn = document.getElementById('back-btn');
+    const deleteBtn = document.getElementById('delete-btn');
+    const markReadBtn = document.getElementById('mark-read-btn');
+    const userSelector = document.getElementById('user-selector');
+    const notification = document.getElementById('notification');
+    const smsCount = document.getElementById('sms-count');
+    const detailLoading = document.getElementById('detail-loading');
+    const currentUserDisplay = document.getElementById('current-user-display');
+    const currentTimeElement = document.getElementById('current-time');
+
+    // 当前选中的短信ID
+    let currentSmsId = null;
+    // 当前用户
+    let currentUser = DEFAULT_PHONE;
+    // 所有短信数据
+    let allSmsData = [];
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 更新当前时间
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 60000); // 每分钟更新一次
+
+        // 设置默认用户
+        updateCurrentUser(DEFAULT_PHONE);
+
+        // 获取用户数据
+        fetchUsers();
+
+        // 获取短信列表
+        fetchSmsList();
+
+        // 绑定事件
+        backBtn.addEventListener('click', hideSmsDetail);
+        deleteBtn.addEventListener('click', deleteSms);
+        markReadBtn.addEventListener('click', markAsRead);
+        userSelector.addEventListener('change', changeUser);
+    });
+
+    // 更新当前时间显示
+    function updateCurrentTime() {
+        const now = new Date();
+        currentTimeElement.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    }
+
+    // 更新当前用户显示
+    function updateCurrentUser(phone) {
+        currentUser = phone;
+        currentUserDisplay.textContent = `当前用户: ${phone}`;
+    }
+
+    // 获取用户列表
+    function fetchUsers() {
+        axios.get(`${API_BASE}/sms/user`)
+            .then(response => {
+                if (response.data.code === 200) {
+                    populateUserSelector(response.data.data);
+                } else {
+                    showNotification('获取用户列表失败: ' + response.data.message, true);
+                }
+            })
+            .catch(error => {
+                console.error('获取用户列表失败:', error);
+                showNotification('获取用户列表失败', true);
+            });
+    }
+
+    // 切换用户手机号
+    function switchUserPhone(phone) {
+        axios.get(`${API_BASE}/sms/phone/${phone}`)
+            .then(response => {
+                if (response.data.code === 200) {
+                    updateCurrentUser(phone);
+                    showNotification(`已切换到用户: ${phone}`);
+
+                    // 重新获取短信列表
+                    fetchSmsList();
+                } else {
+                    showNotification('切换用户失败: ' + response.data.message, true);
+                }
+            })
+            .catch(error => {
+                console.error('切换用户失败:', error);
+                showNotification('切换用户失败', true);
+            });
+    }
+
+    // 获取短信列表
+    function fetchSmsList() {
+        axios.get(`${API_BASE}/sms/sms`)
+            .then(response => {
+                if (response.data.code === 200) {
+                    allSmsData = response.data.data;
+
+                    // 筛选当前用户的短信
+                    const userSms = allSmsData.filter(sms => sms.receiver == currentUser);
+                    renderSmsList(userSms);
+                } else {
+                    showNotification('获取短信列表失败: ' + response.data.message, true);
+                }
+            })
+            .catch(error => {
+                console.error('获取短信列表失败:', error);
+                showNotification('获取短信列表失败', true);
+            });
+    }
+
+    // 获取单条短信详情
+    function fetchSmsDetail(id) {
+        // 显示加载中
+        detailContent.innerHTML = '';
+        detailLoading.style.display = 'block';
+
+        axios.get(`${API_BASE}/sms/sms/${id}`)
+            .then(response => {
+                if (response.data.code === 200) {
+                    renderSmsDetail(response.data.data);
+                } else {
+                    showNotification('获取短信详情失败: ' + response.data.message, true);
+                }
+                detailLoading.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('获取短信详情失败:', error);
+                showNotification('获取短信详情失败', true);
+                detailLoading.style.display = 'none';
+            });
+    }
+
+    // 标记短信为已读
+    function updateSmsReadStatus(id) {
+        axios.put(`${API_BASE}/sms/read/${id}`)
+            .then(response => {
+                if (response.data.code !== 200) {
+                    showNotification('标记已读失败: ' + response.data.message, true);
+                }
+            })
+            .catch(error => {
+                console.error('标记已读失败:', error);
+                showNotification('标记已读失败', true);
+            });
+    }
+
+    // 填充用户选择器
+    function populateUserSelector(users) {
+        userSelector.innerHTML = '<option value="">-- 选择用户 --</option>';
+
+        // 添加默认用户
+        const defaultOption = document.createElement('option');
+        defaultOption.value = DEFAULT_PHONE;
+        defaultOption.textContent = `${DEFAULT_PHONE} (默认用户)`;
+        if (currentUser === DEFAULT_PHONE) {
+            defaultOption.selected = true;
+        }
+        userSelector.appendChild(defaultOption);
+
+        // 添加其他用户
+        users.forEach(user => {
+            if (user != DEFAULT_PHONE) { // 避免重复添加默认用户
+                const option = document.createElement('option');
+                option.value = user;
+                option.textContent = `${user}`;
+                if (user == currentUser) {
+                    option.selected = true;
+                }
+                userSelector.appendChild(option);
+            }
+        });
+    }
+
+    // 渲染短信列表
+    function renderSmsList(smsData) {
+        smsList.innerHTML = '';
+
+        if (smsData.length === 0) {
+            smsList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>暂无短信</p>
+                </div>
+            `;
+            smsCount.textContent = '0条短信';
+            return;
+        }
+
+        // 统计未读消息
+        const unreadCount = smsData.filter(sms => sms.read === 0).length;
+        smsCount.textContent = `${smsData.length}条短信${unreadCount > 0 ? `, ${unreadCount}条未读` : ''}`;
+
+        smsData.forEach(sms => {
+            const smsItem = document.createElement('div');
+            smsItem.className = `sms-item ${sms.read === 0 ? 'unread' : ''}`;
+            smsItem.dataset.id = sms.id;
+
+            // 格式化发送者名称
+            const sender = sms.sender === 88888888 ? 'EasyEnroll系统' : sms.sender;
+
+            // 截断过长的内容
+            const contentPreview = sms.content.length > 35 ?
+                sms.content.substring(0, 35) + '...' : sms.content;
+
+            // 格式化接收时间
+            const time = formatTime(sms.dateReceive);
+
+            smsItem.innerHTML = `
+                <div class="sender">
+                    <span>${sender} ${sms.read === 0 ? '<span class="unread-badge"></span>' : ''}</span>
+                    <span class="time">${time}</span>
+                </div>
+                <div class="message-preview">${contentPreview}</div>
+                <div class="time-info">接收时间: ${formatDateTime(sms.dateReceive)}</div>
+            `;
+
+            smsItem.addEventListener('click', () => showSmsDetail(sms.id));
+            smsList.appendChild(smsItem);
+        });
+    }
+
+    // 显示短信详情
+    function showSmsDetail(smsId) {
+        // 隐藏列表，显示详情
+        document.querySelector('.sms-list').style.display = 'none';
+        smsDetail.style.display = 'flex';
+
+        // 更新当前选中的短信ID
+        currentSmsId = smsId;
+
+        // 获取短信详情
+        fetchSmsDetail(smsId);
+    }
+
+    // 渲染短信详情
+    function renderSmsDetail(sms) {
+        // 设置发送者名称
+        const sender = sms.sender === 88888888 ? 'EasyEnroll系统' : sms.sender;
+        detailSender.textContent = sender;
+
+        // 清空之前的详情内容
+        detailContent.innerHTML = '';
+
+        // 添加消息内容
+        const messageTime = document.createElement('div');
+        messageTime.className = 'message-time';
+        messageTime.textContent = `接收时间: ${formatDateTime(sms.dateReceive)}`;
+        detailContent.appendChild(messageTime);
+
+        const messageBubble = document.createElement('div');
+        messageBubble.className = `message-bubble ${sms.type === 2 ? 'sent' : 'received'}`;
+        messageBubble.textContent = sms.content;
+        detailContent.appendChild(messageBubble);
+
+        // 如果是未读消息，标记为已读
+        if (sms.read === 0) {
+            updateSmsReadStatus(sms.id);
+            showNotification('标记为已读');
+
+            // 更新UI
+            const smsItem = document.querySelector(`.sms-item[data-id="${sms.id}"]`);
+            if (smsItem) {
+                smsItem.classList.remove('unread');
+                const badge = smsItem.querySelector('.unread-badge');
+                if (badge) badge.remove();
+            }
+
+            // 更新计数
+            const unreadCount = document.querySelectorAll('.sms-item.unread').length;
+            smsCount.textContent = `${allSmsData.length}条短信${unreadCount > 0 ? `, ${unreadCount}条未读` : ''}`;
+        }
+    }
+
+    // 隐藏短信详情
+    function hideSmsDetail() {
+        smsDetail.style.display = 'none';
+        document.querySelector('.sms-list').style.display = 'block';
+        currentSmsId = null;
+    }
+
+    // 删除短信
+    function deleteSms() {
+        if (!currentSmsId) return;
+
+        // 这里需要根据实际情况实现删除功能
+        // 由于您的Controller中没有提供删除接口，这里只是模拟
+        showNotification('删除功能需后端支持');
+
+        // 模拟删除后重新获取列表
+        setTimeout(() => {
+            fetchSmsList();
+            hideSmsDetail();
+        }, 1000);
+    }
+
+    // 标记为已读
+    function markAsRead() {
+        if (!currentSmsId) return;
+
+        updateSmsReadStatus(currentSmsId);
+        showNotification('标记为已读');
+
+        // 更新UI
+        const smsItem = document.querySelector(`.sms-item[data-id="${currentSmsId}"]`);
+        if (smsItem) {
+            smsItem.classList.remove('unread');
+            const badge = smsItem.querySelector('.unread-badge');
+            if (badge) badge.remove();
+        }
+
+        // 更新计数
+        const unreadCount = document.querySelectorAll('.sms-item.unread').length;
+        smsCount.textContent = `${allSmsData.length}条短信${unreadCount > 0 ? `, ${unreadCount}条未读` : ''}`;
+    }
+
+    // 切换用户
+    function changeUser() {
+        const selectedPhone = userSelector.value;
+        if (!selectedPhone) {
+            showNotification('请选择用户', true);
+            return;
+        }
+
+        // 切换用户手机号
+        switchUserPhone(selectedPhone);
+    }
+
+    // 显示通知
+    function showNotification(message, isError = false) {
+        notification.textContent = message;
+        notification.className = isError ? 'notification error' : 'notification';
+        notification.style.display = 'block';
+
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 2000);
+    }
+
+    // 定义时间格式化函数
+    const formatTime = (time) => {
+        if (!time) return '';
+        const date = new Date(time);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    };
+
+    // 格式化时间
+/*    function formatTime(dateTimeStr) {
+        if (!dateTimeStr || dateTimeStr === 'NaN-NaN-NaN NaN:NaN') {
+            return '未知时间';
+        }
+
+        try {
+            // 尝试解析日期字符串
+            let date;
+            if (typeof dateTimeStr === 'string' && dateTimeStr.includes('T')) {
+                // ISO格式日期
+                date = new Date(dateTimeStr);
+            } else if (typeof dateTimeStr === 'string' && dateTimeStr.includes('-')) {
+                // 可能是 "YYYY-MM-DD HH:mm:ss" 格式
+                const [datePart, timePart] = dateTimeStr.split(' ');
+                const [year, month, day] = datePart.split('-').map(Number);
+                const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : [0, 0, 0];
+                date = new Date(year, month - 1, day, hours, minutes, seconds);
+            } else {
+                // 尝试直接解析
+                date = new Date(dateTimeStr);
+            }
+
+            // 检查日期是否有效
+            if (isNaN(date.getTime())) {
+                return '无效时间';
+            }
+
+            const now = new Date();
+            const diff = now - date;
+
+            if (diff < 60 * 1000) {
+                return '刚刚';
+            } else if (diff < 60 * 60 * 1000) {
+                return `${Math.floor(diff / (60 * 1000))}分钟前`;
+            } else if (diff < 24 * 60 * 60 * 1000) {
+                return `${Math.floor(diff / (60 * 60 * 1000))}小时前`;
+            } else {
+                return `${date.getMonth()+1}月${date.getDate()}日`;
+            }
+        } catch (error) {
+            console.error('时间格式化错误:', error, dateTimeStr);
+            return '时间错误';
+        }
+    }*/
+
+    // 格式化详细时间
+    function formatDateTime(dateTimeStr) {
+        if (!dateTimeStr || dateTimeStr === 'NaN-NaN-NaN NaN:NaN') {
+            return '未知时间';
+        }
+
+        try {
+            // 尝试解析日期字符串
+            let date;
+            if (typeof dateTimeStr === 'string' && dateTimeStr.includes('T')) {
+                // ISO格式日期
+                date = new Date(dateTimeStr);
+            } else if (typeof dateTimeStr === 'string' && dateTimeStr.includes('-')) {
+                // 可能是 "YYYY-MM-DD HH:mm:ss" 格式
+                const [datePart, timePart] = dateTimeStr.split(' ');
+                const [year, month, day] = datePart.split('-').map(Number);
+                const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : [0, 0, 0];
+                date = new Date(year, month - 1, day, hours, minutes, seconds);
+            } else {
+                // 尝试直接解析
+                date = new Date(dateTimeStr);
+            }
+
+            // 检查日期是否有效
+            if (isNaN(date.getTime())) {
+                return '无效时间';
+            }
+
+            return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        } catch (error) {
+            console.error('详细时间格式化错误:', error, dateTimeStr);
+            return '时间格式错误';
+        }
+    }
+
+
+</script>
+</body>
+</html>

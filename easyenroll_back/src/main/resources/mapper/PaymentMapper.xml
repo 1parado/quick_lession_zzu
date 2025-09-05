@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.PaymentMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Payment">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="paid_count" jdbcType="INTEGER" property="paidCount" />
+    <result column="payable_count" jdbcType="INTEGER" property="payableCount" />
+  </resultMap>
+  <resultMap id="PaymentPOResultMap" type="com.ly.po.PaymentPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="payer_id" jdbcType="VARCHAR" property="payerId" />
+    <result column="pay_method" jdbcType="VARCHAR" property="payMethod" />
+    <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, `name`, amount, start_time, end_time, paid_count, payable_count
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from payment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+        payment
+    </select>
+  <select id="selectByNoId" resultMap="BaseResultMap">
+    SELECT *
+    FROM
+      payment
+    WHERE
+        id NOT IN
+    <foreach collection="payIds" item="payId" separator="," open="(" close=")">
+        #{payId}
+    </foreach>
+  </select>
+
+  <select id="selectByIdBySno" resultMap="PaymentPOResultMap">
+    SELECT
+        p.id, p.name, p.amount, p.start_time, p.end_time, ps.payer_id, ps.pay_method, ps.pay_time
+    FROM
+        payment p LEFT JOIN payment_selection ps ON p.id = ps.pay_id
+    WHERE
+        ps.payer_id = #{sno}
+        AND p.id IN
+    <foreach collection="payIds" item="payId" separator="," open="(" close=")">
+      #{payId}
+    </foreach>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from payment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Payment" useGeneratedKeys="true">
+    insert into payment (`name`, amount, start_time, 
+      end_time, paid_count, payable_count
+      )
+    values (#{name,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{paidCount,jdbcType=INTEGER}, #{payableCount,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Payment" useGeneratedKeys="true">
+    insert into payment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="paidCount != null">
+        paid_count,
+      </if>
+      <if test="payableCount != null">
+        payable_count,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="paidCount != null">
+        #{paidCount,jdbcType=INTEGER},
+      </if>
+      <if test="payableCount != null">
+        #{payableCount,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Payment">
+    update payment
+    <set>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="paidCount != null">
+        paid_count = #{paidCount,jdbcType=INTEGER},
+      </if>
+      <if test="payableCount != null">
+        payable_count = #{payableCount,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.Payment">
+    update payment
+    set `name` = #{name,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      paid_count = #{paidCount,jdbcType=INTEGER},
+      payable_count = #{payableCount,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <update id="updatePaidCountById">
+      UPDATE payment
+      SET
+          `paid_count` = #{count}
+      WHERE
+          id = #{id}
+    </update>
+
+</mapper>

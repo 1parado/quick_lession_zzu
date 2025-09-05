@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.PageMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Page">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="mentioned_course_name" jdbcType="VARCHAR" property="mentionedCourseName" />
+    <result column="mentioned_course_code" jdbcType="VARCHAR" property="mentionedCourseCode" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="publish_name" jdbcType="VARCHAR" property="publishName" />
+    <result column="publish_sno" jdbcType="BIGINT" property="publishSno" />
+    <result column="publish_time" jdbcType="TIMESTAMP" property="publishTime" />
+    <result column="comment_count" jdbcType="BIGINT" property="commentCount" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="rating" jdbcType="DOUBLE" property="rating" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, title, mentioned_course_name, mentioned_course_code, content, publish_name, publish_sno,
+    publish_time, comment_count, `type`, rating
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from post_page
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectPartBySize" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+          post_page
+        ORDER BY
+          publish_time DESC
+        LIMIT
+          #{size}
+    </select>
+    <select id="selectHotList" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+          post_page
+        WHERE
+          publish_time > #{oneYearAgo}
+        ORDER BY
+            comment_count DESC
+        LIMIT
+            10
+
+    </select>
+  <select id="selectPartBySizeByText" resultMap="BaseResultMap">
+    SELECT
+        *
+    FROM
+      post_page
+    WHERE
+        title LIKE CONCAT('%', #{searchText}, '%')
+       OR
+        content LIKE CONCAT('%', #{searchText}, '%')
+    ORDER BY
+        publish_time DESC
+    LIMIT
+        #{size}
+  </select>
+  <select id="selectPartBySizeByCourseCode" resultMap="BaseResultMap">
+    SELECT
+      *
+    FROM
+      post_page
+    WHERE
+      mentioned_course_code = #{courseCode}
+    ORDER BY
+      publish_time DESC
+      LIMIT
+      #{size}
+  </select>
+  <select id="selectPartBySizeByTextByCourseCode" resultMap="BaseResultMap">
+    SELECT
+      *
+    FROM
+      post_page
+    WHERE
+      mentioned_course_code = #{courseCode}
+    AND
+      (
+      title LIKE CONCAT('%', #{searchText}, '%')
+    OR
+      content LIKE CONCAT('%', #{searchText}, '%')
+        )
+    ORDER BY
+      publish_time DESC
+      LIMIT
+      #{size}
+  </select>
+  <select id="selectPartBySizeByCourseCodeByHot" resultMap="BaseResultMap">
+    SELECT
+      *
+    FROM
+      post_page
+    WHERE
+      mentioned_course_code = #{courseCode}
+    ORDER BY
+      comment_count DESC
+      LIMIT
+      #{size}
+  </select>
+    <select id="selectRatingByMentionedCourseCode" resultType="java.lang.Double">
+      SELECT
+          rating
+      FROM
+          post_page
+      WHERE
+        mentioned_course_code = #{courseCode}
+    </select>
+    <select id="selectByNoAndCourseCode" resultType="com.ly.pojo.Page">
+      SELECT *
+      FROM
+          post_page
+      WHERE
+        publish_sno = #{publishSno} AND mentioned_course_code = #{mentionedCourseCode}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from post_page
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Page" useGeneratedKeys="true">
+    insert into post_page (title, mentioned_course_name, mentioned_course_code, 
+      content, publish_name, publish_sno,
+      publish_time, comment_count, `type`,
+      rating)
+    values (#{title,jdbcType=VARCHAR}, #{mentionedCourseName,jdbcType=VARCHAR}, #{mentionedCourseCode,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{publishName,jdbcType=VARCHAR}, #{publishSno,jdbcType=BIGINT},
+      #{publishTime,jdbcType=TIMESTAMP}, #{commentCount,jdbcType=BIGINT}, #{type,jdbcType=INTEGER},
+      #{rating,jdbcType=DOUBLE})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Page" useGeneratedKeys="true">
+    insert into post_page
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        title,
+      </if>
+      <if test="mentionedCourseName != null">
+        mentioned_course_name,
+      </if>
+      <if test="mentionedCourseCode != null">
+        mentioned_course_code,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="publishName != null">
+        publish_name,
+      </if>
+      <if test="publishSno != null">
+        publish_sno,
+      </if>
+      <if test="publishTime != null">
+        publish_time,
+      </if>
+      <if test="commentCount != null">
+        comment_count,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="rating != null">
+        rating,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="mentionedCourseName != null">
+        #{mentionedCourseName,jdbcType=VARCHAR},
+      </if>
+      <if test="mentionedCourseCode != null">
+        #{mentionedCourseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="publishName != null">
+        #{publishName},
+      </if>
+      <if test="publishSno != null">
+        #{publishSno},
+      </if>
+      <if test="publishTime != null">
+        #{publishTime},
+      </if>
+      <if test="commentCount != null">
+        #{commentCount},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="rating != null">
+        #{rating,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Page">
+    update post_page
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="mentionedCourseName != null">
+        mentioned_course_name = #{mentionedCourseName,jdbcType=VARCHAR},
+      </if>
+      <if test="mentionedCourseCode != null">
+        mentioned_course_code = #{mentionedCourseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="publishName != null">
+        publish_name = #{publishName},
+      </if>
+      <if test="publishSno != null">
+        publish_sno = #{publishSno},
+      </if>
+      <if test="publishTime != null">
+        publish_time = #{publishTime},
+      </if>
+      <if test="commentCount != null">
+        comment_count = #{commentCount},
+      </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="rating != null">
+        rating = #{rating,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.Page">
+    update post_page
+    set title = #{title,jdbcType=VARCHAR},
+      mentioned_course_name = #{mentionedCourseName,jdbcType=VARCHAR},
+      mentioned_course_code = #{mentionedCourseCode,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      publish_name = #{publishName,jdbcType=VARCHAR},
+      publish_sno = #{publishSno,jdbcType=BIGINT},
+      publish_time = #{publishTime,jdbcType=TIMESTAMP},
+      comment_count = #{commentCount,jdbcType=BIGINT},
+      `type` = #{type,jdbcType=INTEGER},
+      rating = #{rating,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <update id="updateCommentCountById">
+      update post_page
+      set
+        comment_count = comment_count + 1
+      WHERE
+          id = #{postId}
+    </update>
+    <update id="updateCommentCountByIdSub">
+      update post_page
+      set
+        comment_count = comment_count - 1
+      WHERE
+        id = #{postId}
+    </update>
+</mapper>

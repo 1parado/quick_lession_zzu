@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.SmsTemplateMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.SmsTemplate">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="component" jdbcType="VARCHAR" property="component" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, `type`, `status`, component
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sms_template
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectByType" resultMap="BaseResultMap">
+        SELECT *
+        FROM sms_template
+        WHERE type = #{type}
+    </select>
+    <select id="selectByTypeByStatus" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+        sms_template
+      WHERE
+          type = #{template}
+        AND
+          status = #{status}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sms_template
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.SmsTemplate" useGeneratedKeys="true">
+    insert into sms_template (`type`, `status`, component
+      )
+    values (#{type,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{component,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.SmsTemplate" useGeneratedKeys="true">
+    insert into sms_template
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="component != null">
+        component,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="component != null">
+        #{component,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.SmsTemplate">
+    update sms_template
+    <set>
+      <if test="type != null">
+        `type` = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="component != null">
+        component = #{component,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.SmsTemplate">
+    update sms_template
+    set `type` = #{type,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=INTEGER},
+      component = #{component,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <update id="updateStatusByType">
+        UPDATE sms_template
+        set
+            `status` = 0
+        where `type` = #{type}
+
+    </update>
+</mapper>

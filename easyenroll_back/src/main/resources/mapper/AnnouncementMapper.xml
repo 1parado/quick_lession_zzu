@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.AnnouncementMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Announcement">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="publish_time" jdbcType="TIMESTAMP" property="publishTime" />
+    <result column="public_name" jdbcType="VARCHAR" property="publicName" />
+    <result column="status" jdbcType="OTHER" property="status" />
+  </resultMap>
+
+  <resultMap id="DraftPOResultMap" type="com.ly.po.DraftPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="publish_time" jdbcType="TIMESTAMP" property="publishTime" />
+    <result column="public_name" jdbcType="VARCHAR" property="publicName" />
+    <result column="status" jdbcType="OTHER" property="status" />
+    <result column="time" jdbcType="INTEGER" property="time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, title, content, publish_time, public_name, `status`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from announcement
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectAnnouncement" resultMap="BaseResultMap">
+    select
+      *
+    from announcement
+  </select>
+
+  <select id="selectAnnouncementByTeacher" resultMap="BaseResultMap">
+    select
+      *
+    from announcement
+    WHERE public_name = #{teacherName}
+  </select>
+
+  <select id="selectAnnouncementByStatus" resultMap="BaseResultMap">
+    select
+      *
+    from announcement
+    where status = #{status}
+    ORDER BY
+      publish_time DESC
+  </select>
+
+  <select id="selectAnnouncementByStatusByTeacher" resultMap="BaseResultMap">
+    select
+      *
+    from announcement
+    where status = #{status} and public_name = #{teacherName}
+    ORDER BY
+      publish_time DESC
+  </select>
+
+  <select id="selectOne"  resultMap="BaseResultMap">
+    select
+        *
+    from
+        announcement
+    WHERE
+        status = 'PUBLISHED'
+    ORDER BY
+        publish_time DESC
+    LIMIT 1
+  </select>
+  <select id="selectDraftByTime" resultMap="DraftPOResultMap">
+    SELECT
+      a.id, a.title, a.content, a.publish_time, a.public_name, a.status,
+        nt.time
+    FROM
+      announcement a LEFT JOIN notify_time nt ON a.id = nt.draft_id
+    WHERE
+        a.status = 'DRAFT'
+        AND a.publish_time > UTC_TIMESTAMP()
+  </select>
+
+  <select id="selectDraftByTimeByNoAdmin" resultMap="DraftPOResultMap">
+    SELECT
+      a.id, a.title, a.content, a.publish_time, a.public_name, a.status,
+      nt.time
+    FROM
+      announcement a LEFT JOIN notify_time nt ON a.id = nt.draft_id
+    WHERE
+      a.status = 'DRAFT'
+      AND a.publish_time > UTC_TIMESTAMP()
+    AND a.public_name != 'admin'
+  </select>
+    <select id="selectPublished" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+          announcement
+        WHERE
+            status = 'PUBLISHED'
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from announcement
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Announcement" useGeneratedKeys="true">
+    insert into announcement (title, content, publish_time, 
+      public_name, `status`)
+    values (#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{publishTime,jdbcType=TIMESTAMP}, 
+      #{publicName,jdbcType=VARCHAR}, #{status,jdbcType=OTHER})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Announcement" useGeneratedKeys="true">
+    insert into announcement
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        title,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="publishTime != null">
+        publish_time,
+      </if>
+      <if test="publicName != null">
+        public_name,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="publishTime != null">
+        #{publishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="publicName != null">
+        #{publicName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=OTHER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Announcement">
+    update announcement
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="publishTime != null">
+        publish_time = #{publishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="publicName != null">
+        public_name = #{publicName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=OTHER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.Announcement">
+    update announcement
+    set title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      publish_time = #{publishTime,jdbcType=TIMESTAMP},
+      public_name = #{publicName,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=OTHER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <update id="updateById">
+      update announcement
+      set
+        `status` = 'DELETED',
+        publish_time = #{now}
+      where
+          id = #{id}
+    </update>
+  <update id="updateDraftById">
+    update announcement
+    set
+      `status` = 'DRAFT',
+      publish_time = #{now}
+    where
+      id = #{id}
+  </update>
+</mapper>

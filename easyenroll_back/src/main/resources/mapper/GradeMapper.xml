@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.GradeMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Grade">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode" />
+    <result column="sno" jdbcType="BIGINT" property="sno" />
+    <result column="grade" jdbcType="DOUBLE" property="grade" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <resultMap id="POResultMap" type="com.ly.po.CourseGradePO">
+    <id property="id" column="grade_id"/>
+    <result property="courseCode" column="course_code"/>
+    <result property="sno" column="sno"/>
+    <result property="grade" column="grade"/>
+    <result property="state" column="state"/>
+    <result property="name" column="course_name"/>
+    <result property="credit" column="credit"/>
+    <result property="courseType" column="course_type"/>
+    <result property="college" column="college"/>
+    <result property="capacity" column="capacity"/>
+    <result property="remain" column="remain"/>
+    <result property="isSeckill" column="is_seckill"/>
+    <result property="semester" column="semester"/>
+    <result property="description" column="description"/>
+    <result property="teacherName" column="teacher_name"/>
+    <result property="classTime" column="class_time"/>
+    <result property="classLocation" column="class_location"/>
+    <result property="weekRange" column="week_range"/>
+    <result property="preCourseCode" column="pre_course_code"/>
+    <result property="tno" column="tno"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, course_code, sno, grade, `state`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from grade
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectBySnoByCourseCode" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+          grade
+      WHERE
+          sno = #{sno}
+      AND
+          course_code = #{courseCode}
+    </select>
+  <select id="selectPOBySno" resultMap="POResultMap">
+    SELECT
+      g.id as grade_id,
+      g.course_code,
+      g.sno,
+      g.grade,
+      g.state,
+      c.id as course_id,
+      c.name as course_name,
+      c.credit,
+      c.course_type,
+      c.college,
+      c.capacity,
+      c.remain,
+      c.is_seckill,
+      c.semester,
+      c.description,
+      t.name as teacher_name,
+      c.class_time,
+      c.class_location,
+      c.week_range,
+      c2.course_code as pre_course_code,
+      t.tno
+    FROM grade g
+           LEFT JOIN courses c ON g.course_code = c.course_code
+           LEFT JOIN teachers t ON t.id = c.teacher_id
+           LEFT JOIN courses c2 ON c.pre_course = c2.id
+    WHERE g.sno = #{sno}
+  </select>
+
+    <select id="selectGradeDTOBySno" resultType="com.ly.dto.GradeDTO">
+        SELECT
+          g.course_code as courseCode,
+          c.name as courseName,
+          g.grade,
+          g.state
+        FROM
+            grade g LEFT JOIN courses c ON c.course_code = g.course_code
+        WHERE
+            g.sno = #{sno}
+    </select>
+  <select id="selectAvgGradesBySno" resultType="java.lang.Double">
+    SELECT
+        COALESCE(AVG(grade), 0) AS average_grade
+    FROM
+        grade
+    WHERE
+        sno = #{sno}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from grade
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Grade" useGeneratedKeys="true">
+    insert into grade (course_code, sno, grade, 
+      `state`)
+    values (#{courseCode,jdbcType=VARCHAR}, #{sno,jdbcType=BIGINT}, #{grade,jdbcType=DOUBLE}, 
+      #{state,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Grade" useGeneratedKeys="true">
+    insert into grade
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="courseCode != null">
+        course_code,
+      </if>
+      <if test="sno != null">
+        sno,
+      </if>
+      <if test="grade != null">
+        grade,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="courseCode != null">
+        #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sno != null">
+        #{sno,jdbcType=BIGINT},
+      </if>
+      <if test="grade != null">
+        #{grade,jdbcType=DOUBLE},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Grade">
+    update grade
+    <set>
+      <if test="courseCode != null">
+        course_code = #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sno != null">
+        sno = #{sno,jdbcType=BIGINT},
+      </if>
+      <if test="grade != null">
+        grade = #{grade,jdbcType=DOUBLE},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.Grade">
+    update grade
+    set course_code = #{courseCode,jdbcType=VARCHAR},
+      sno = #{sno,jdbcType=BIGINT},
+      grade = #{grade,jdbcType=DOUBLE},
+      `state` = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

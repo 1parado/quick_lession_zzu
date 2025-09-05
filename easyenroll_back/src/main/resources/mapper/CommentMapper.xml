@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.CommentMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Comment">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="reviewer_name" jdbcType="VARCHAR" property="reviewerName" />
+    <result column="reviewer_no" jdbcType="BIGINT" property="reviewerNo" />
+    <result column="like_count" jdbcType="BIGINT" property="likeCount" />
+    <result column="related_post_id" jdbcType="INTEGER" property="relatedPostId" />
+    <result column="related_comment_id" jdbcType="INTEGER" property="relatedCommentId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, content, reviewer_name, reviewer_no, like_count, related_post_id, related_comment_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectPartByPostIdBySize" resultMap="BaseResultMap">
+      SELECT *
+      FROM comment
+      WHERE related_post_id = #{postId}
+      ORDER BY id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+  <select id="selectAllByPostId" resultMap="BaseResultMap">
+        SELECT *
+        FROM comment
+        WHERE related_post_id = #{postId}
+        ORDER BY id DESC
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from comment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByRelatedCommentId">
+      delete from comment
+      where related_comment_id = #{commentId}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Comment" useGeneratedKeys="true">
+    insert into comment (content, reviewer_name, reviewer_no, 
+      like_count, related_post_id, related_comment_id
+      )
+    values (#{content,jdbcType=VARCHAR}, #{reviewerName,jdbcType=VARCHAR}, #{reviewerNo,jdbcType=BIGINT}, 
+      #{likeCount,jdbcType=BIGINT}, #{relatedPostId,jdbcType=INTEGER}, #{relatedCommentId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Comment" useGeneratedKeys="true">
+    insert into comment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="content != null">
+        content,
+      </if>
+      <if test="reviewerName != null">
+        reviewer_name,
+      </if>
+      <if test="reviewerNo != null">
+        reviewer_no,
+      </if>
+      <if test="likeCount != null">
+        like_count,
+      </if>
+      <if test="relatedPostId != null">
+        related_post_id,
+      </if>
+      <if test="relatedCommentId != null">
+        related_comment_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewerName != null">
+        #{reviewerName,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewerNo != null">
+        #{reviewerNo,jdbcType=BIGINT},
+      </if>
+      <if test="likeCount != null">
+        #{likeCount,jdbcType=BIGINT},
+      </if>
+      <if test="relatedPostId != null">
+        #{relatedPostId,jdbcType=INTEGER},
+      </if>
+      <if test="relatedCommentId != null">
+        #{relatedCommentId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Comment">
+    update comment
+    <set>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewerName != null">
+        reviewer_name = #{reviewerName,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewerNo != null">
+        reviewer_no = #{reviewerNo,jdbcType=BIGINT},
+      </if>
+      <if test="likeCount != null">
+        like_count = #{likeCount,jdbcType=BIGINT},
+      </if>
+      <if test="relatedPostId != null">
+        related_post_id = #{relatedPostId,jdbcType=INTEGER},
+      </if>
+      <if test="relatedCommentId != null">
+        related_comment_id = #{relatedCommentId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.Comment">
+    update comment
+    set content = #{content,jdbcType=VARCHAR},
+      reviewer_name = #{reviewerName,jdbcType=VARCHAR},
+      reviewer_no = #{reviewerNo,jdbcType=BIGINT},
+      like_count = #{likeCount,jdbcType=BIGINT},
+      related_post_id = #{relatedPostId,jdbcType=INTEGER},
+      related_comment_id = #{relatedCommentId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateLikeCountByCommentIdAdd">
+    UPDATE comment
+    set like_count = like_count + 1
+    WHERE
+        id = #{commentId}
+  </update>
+  <update id="updateLikeCountByCommentIdSub">
+    UPDATE comment
+    set like_count = like_count - 1
+    WHERE
+      id = #{commentId}
+  </update>
+</mapper>

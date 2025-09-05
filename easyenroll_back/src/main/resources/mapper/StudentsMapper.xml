@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.StudentsMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Students">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="gender" jdbcType="VARCHAR" property="gender" />
+    <result column="age" jdbcType="INTEGER" property="age" />
+    <result column="sno" jdbcType="BIGINT" property="sno" />
+    <result column="college" jdbcType="VARCHAR" property="college" />
+    <result column="major" jdbcType="VARCHAR" property="major" />
+    <result column="credit" jdbcType="DOUBLE" property="credit" />
+    <result column="phone" jdbcType="BIGINT" property="phone" />
+    <result column="input_time" jdbcType="VARCHAR" property="inputTime" />
+  </resultMap>
+
+  <resultMap id="POResultMap" type="com.ly.po.StudentsGradePO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="gender" jdbcType="VARCHAR" property="gender" />
+    <result column="age" jdbcType="INTEGER" property="age" />
+    <result column="sno" jdbcType="BIGINT" property="sno" />
+    <result column="college" jdbcType="VARCHAR" property="college" />
+    <result column="major" jdbcType="VARCHAR" property="major" />
+    <result column="credit" jdbcType="DOUBLE" property="credit" />
+    <result column="phone" jdbcType="BIGINT" property="phone" />
+    <result column="input_time" jdbcType="VARCHAR" property="inputTime" />
+    <result column="grade" jdbcType="DOUBLE" property="grade" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, `name`, gender, age, sno, college, major, credit, phone, input_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from students
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectBySno" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from students
+    where sno = #{sno}
+  </select>
+
+  <select id="selectStudent" resultMap="BaseResultMap">
+    select
+    *
+    from students
+  </select>
+  <select id="selectStudentBySearch" resultMap="BaseResultMap">
+    select
+      *
+    from students
+    WHERE   name LIKE CONCAT('%', #{searchText}, '%')
+  </select>
+  <select id="selectIdBySno" resultType="java.lang.Integer">
+    SELECT
+        id
+    FROM
+        students
+    WHERE
+        sno = #{sno}
+  </select>
+    <select id="selectListByKeyword" resultMap="BaseResultMap">
+      SELECT
+      <include refid="Base_Column_List"/>
+      FROM
+      students
+      WHERE
+      name LIKE CONCAT(#{keyword}, '%')
+      OR sno LIKE CONCAT(#{keyword}, '%')
+      ORDER BY
+      name ASC
+      LIMIT 10
+    </select>
+    <select id="selectStudentByIds" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+          students
+      WHERE
+        id IN
+      <foreach collection="studentIds" item="id" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+    </select>
+    <select id="selectSnoById" resultType="java.lang.Long">
+      SELECT sno
+      FROM students
+      WHERE id = #{studentId}
+    </select>
+    <select id="selectBySnos" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+          students
+      WHERE
+        sno IN
+      <foreach collection="snos" item="sno" open="(" close=")" separator=",">
+        #{sno}
+      </foreach>
+    </select>
+    <select id="selectByHasPhone" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+         students
+      WHERE
+          phone IS NOT NULL
+      </select>
+  <select id="selectStudentGradeByIds" resultMap="POResultMap">
+    SELECT
+        s.id,
+        s.user_id,
+        s.`name`,
+        s.gender,
+        s.age,
+        s.sno,
+        s.college,
+        s.major,
+        s.credit,
+        s.phone,
+        s.input_time,
+        g.grade,
+        g.state
+    FROM
+        students s LEFT JOIN grade g ON s.sno = g.sno
+    WHERE
+        s.id IN
+    <foreach collection="studentIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+    <select id="selectAllSno" resultType="java.lang.Long">
+        SELECT  DISTINCT
+            sno
+        FROM
+            students
+    </select>
+    <select id="selectNameBySno" resultType="java.lang.String">
+      SELECT
+          name
+      FROM
+          students
+      WHERE
+          sno = #{no}
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from students
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Students" useGeneratedKeys="true">
+    insert into students (user_id, `name`, gender, 
+      age, sno, college, major, 
+      credit, phone, input_time
+      )
+    values (#{userId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=VARCHAR}, 
+      #{age,jdbcType=INTEGER}, #{sno,jdbcType=BIGINT}, #{college,jdbcType=VARCHAR}, #{major,jdbcType=VARCHAR}, 
+      #{credit,jdbcType=DOUBLE}, #{phone,jdbcType=BIGINT}, #{inputTime,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Students" useGeneratedKeys="true">
+    insert into students
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="gender != null">
+        gender,
+      </if>
+      <if test="age != null">
+        age,
+      </if>
+      <if test="sno != null">
+        sno,
+      </if>
+      <if test="college != null">
+        college,
+      </if>
+      <if test="major != null">
+        major,
+      </if>
+      <if test="credit != null">
+        credit,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="inputTime != null">
+        input_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        #{gender,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="sno != null">
+        #{sno,jdbcType=BIGINT},
+      </if>
+      <if test="college != null">
+        #{college,jdbcType=VARCHAR},
+      </if>
+      <if test="major != null">
+        #{major,jdbcType=VARCHAR},
+      </if>
+      <if test="credit != null">
+        #{credit,jdbcType=DOUBLE},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=BIGINT},
+      </if>
+      <if test="inputTime != null">
+        #{inputTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+    <insert id="insertBatch">
+      INSERT INTO students (
+      id,
+      user_id,
+      name,
+      gender,
+      age,
+      sno,
+      college,
+      major,
+      credit,
+      phone,
+      input_time
+      ) VALUES
+      <foreach collection="list" item="item" separator=",">
+      (
+      #{item.id},
+      #{item.userId},
+      #{item.name},
+      #{item.gender},
+      #{item.age},
+      #{item.sno},
+      #{item.college},
+      #{item.major},
+      #{item.credit},
+      #{item.phone},
+      #{item.inputTime}
+      )
+      </foreach>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Students">
+    update students
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        gender = #{gender,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="sno != null">
+        sno = #{sno,jdbcType=BIGINT},
+      </if>
+      <if test="college != null">
+        college = #{college,jdbcType=VARCHAR},
+      </if>
+      <if test="major != null">
+        major = #{major,jdbcType=VARCHAR},
+      </if>
+      <if test="credit != null">
+        credit = #{credit,jdbcType=DOUBLE},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=BIGINT},
+      </if>
+      <if test="inputTime != null">
+        input_time = #{inputTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.Students">
+    update students
+    set
+      `name` = #{name,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=VARCHAR},
+      age = #{age,jdbcType=INTEGER},
+      sno = #{sno,jdbcType=BIGINT},
+      college = #{college,jdbcType=VARCHAR},
+      major = #{major,jdbcType=VARCHAR},
+      credit = #{credit,jdbcType=DOUBLE},
+      phone = #{phone,jdbcType=BIGINT},
+      input_time = #{inputTime,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateBySno" parameterType="com.ly.pojo.Students">
+    update students
+    set
+        phone = #{phone,jdbcType=BIGINT}
+    where sno = #{sno,jdbcType=BIGINT}
+  </update>
+</mapper>

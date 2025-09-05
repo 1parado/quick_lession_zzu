@@ -1,0 +1,51 @@
+
+
+spring:
+  application:
+    name: easyenroll_back
+  profiles:
+    active: dev
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/easy_enroll?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+
+  data:
+    redis:
+      database: 1
+      port: 6379
+      host: 192.168.173.128
+      password: 123456
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+# MyBatis
+mybatis:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.ly.pojo
+
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: select-producer-group
+    #send-message-timeout: 3000
+    retry-times-when-send-failed: 2
+    send-message-timeout: 60000 # 调整为60秒
+    transaction-timeout: 60000 # 事务超时时间
+
+
+server:
+  port: 8088
+
+jwt:
+  secret: "your-256-bit-secret-must-be-at-least-32-chars-long-and-base64-encoded"
+  expire: 86400
+  header: Authorization
+  token-prefix: "Bearer "

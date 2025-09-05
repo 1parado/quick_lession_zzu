@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.PaymentSelectionMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.PaymentSelection">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="pay_id" jdbcType="INTEGER" property="payId" />
+    <result column="payer_id" jdbcType="BIGINT" property="payerId" />
+    <result column="pay_method" jdbcType="VARCHAR" property="payMethod" />
+    <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+    <result column="pay_status" jdbcType="INTEGER" property="payStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, pay_id, payer_id, pay_method, pay_time, pay_status
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from payment_selection
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectPayIdByPayerId" resultType="java.lang.Integer">
+      SELECT
+          pay_id
+      FROM
+          payment_selection
+      WHERE payer_id = #{sno}
+        AND
+          pay_status = 1
+    </select>
+
+  <select id="selectByPayId" resultType="java.lang.Integer">
+    SELECT
+        count(1)
+    FROM
+      payment_selection
+    WHERE
+        pay_id = #{id}
+  </select>
+    <select id="selectPayerIdByPayId" resultType="java.lang.Long">
+      SELECT
+          payer_id
+      FROM
+        payment_selection
+      WHERE
+          pay_id = #{payId}
+      AND
+          pay_status = 1
+    </select>
+    <select id="selectByPayIdAndPayerId" resultMap="BaseResultMap">
+      SELECT *
+      FROM
+        payment_selection
+      WHERE
+        pay_id = #{id}
+        AND
+        payer_id = #{payerId}
+    </select>
+  <select id="selectByPayIdByPay" resultType="java.lang.Integer">
+    SELECT
+      count(1)
+    FROM
+      payment_selection
+    WHERE
+      pay_id = #{id}
+    AND
+        pay_status = 1
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from payment_selection
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByPayId">
+      DELETE FROM payment_selection
+      WHERE pay_id = #{id}
+    </delete>
+    <delete id="deleteOne">
+      DELETE FROM payment_selection
+      WHERE pay_id = #{id} AND payer_id = #{payerId}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.PaymentSelection" useGeneratedKeys="true">
+    insert into payment_selection (pay_id, payer_id, pay_method, pay_time, pay_status
+      )
+    values (#{payId,jdbcType=INTEGER}, #{payerId,jdbcType=BIGINT}, #{payMethod,jdbcType=VARCHAR}, #{payTime}, #{payStatus}
+      )
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.PaymentSelection">
+    update payment_selection
+    <set>
+      <if test="payId != null">
+        pay_id = #{payId,jdbcType=INTEGER},
+      </if>
+      <if test="payerId != null">
+        payer_id = #{payerId,jdbcType=BIGINT},
+      </if>
+      <if test="payMethod != null">
+        pay_method = #{payMethod,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.PaymentSelection">
+    update payment_selection
+    set pay_id = #{payId,jdbcType=INTEGER},
+      payer_id = #{payerId,jdbcType=BIGINT},
+      pay_method = #{payMethod,jdbcType=VARCHAR},
+      pay_time = #{payTime},
+      pay_status = #{payStatus}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPayIdAndPayerId">
+    update payment_selection
+    set
+        pay_method = #{payMethod,jdbcType=VARCHAR},
+        pay_time = #{payTime},
+        pay_status = #{payStatus}
+    where pay_id = #{payId,jdbcType=INTEGER}
+      AND
+        payer_id = #{payerId,jdbcType=BIGINT}
+  </update>
+</mapper>

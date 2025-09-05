@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.ExamMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.Exam">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="exam_code" jdbcType="VARCHAR" property="examCode" />
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <resultMap id="POResultMap" type="com.ly.po.ExamPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="credit" jdbcType="DOUBLE" property="credit" />
+    <result column="course_type" jdbcType="VARCHAR" property="courseType" />
+    <result column="college" jdbcType="VARCHAR" property="college" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="examStartTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="examEndTime" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, exam_code, course_code, start_time, end_time, `state`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from exam
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectPOByCourseId" resultMap="POResultMap">
+        SELECT
+            c.id,
+            c.course_code,
+            c.name,
+            c.credit,
+            c.course_type,
+            c.college,
+            e.start_time,
+            e.end_time,
+            e.state
+        FROM exam e LEFT JOIN courses c ON e.course_code = c.course_code
+        WHERE c.id = #{courseId}
+    </select>
+    <select id="selectPOAll" resultMap="POResultMap">
+      SELECT
+        c.id,
+        c.course_code,
+        c.name,
+        c.credit,
+        c.course_type,
+        c.college,
+        e.start_time,
+        e.end_time,
+        e.state
+      FROM exam e LEFT JOIN courses c ON e.course_code = c.course_code
+    </select>
+    <select id="selectPOAllByCourseCodes" resultMap="POResultMap">
+      SELECT
+        c.id,
+        c.course_code,
+        c.name,
+        c.credit,
+        c.course_type,
+        c.college,
+        e.start_time,
+        e.end_time,
+        e.state
+      FROM exam e LEFT JOIN courses c ON e.course_code = c.course_code
+        WHERE
+            e.course_code IN
+        <foreach collection="courseCodes" separator="," open="(" close=")" item="courseCode">
+            #{courseCode}
+        </foreach>
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from exam
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByCourseCode">
+    DELETE FROM exam
+    WHERE course_code = #{courseCode}
+  </delete>
+
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Exam" useGeneratedKeys="true">
+    insert into exam (exam_code, course_code, start_time, 
+      end_time, `state`)
+    values (#{examCode,jdbcType=VARCHAR}, #{courseCode,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{state,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.Exam" useGeneratedKeys="true">
+    insert into exam
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="examCode != null">
+        exam_code,
+      </if>
+      <if test="courseCode != null">
+        course_code,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="examCode != null">
+        #{examCode,jdbcType=VARCHAR},
+      </if>
+      <if test="courseCode != null">
+        #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.Exam">
+    update exam
+    <set>
+      <if test="examCode != null">
+        exam_code = #{examCode,jdbcType=VARCHAR},
+      </if>
+      <if test="courseCode != null">
+        course_code = #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.Exam">
+    update exam
+    set exam_code = #{examCode,jdbcType=VARCHAR},
+      course_code = #{courseCode,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      `state` = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByCourseCode">
+    update exam
+    set exam_code = #{examCode,jdbcType=VARCHAR},
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+        `state` = #{state,jdbcType=INTEGER}
+    where course_code = #{courseCode,jdbcType=VARCHAR}
+  </update>
+</mapper>

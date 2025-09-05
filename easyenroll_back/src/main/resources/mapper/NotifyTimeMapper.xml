@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.NotifyTimeMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.NotifyTime">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="draft_id" jdbcType="INTEGER" property="draftId" />
+    <result column="time" jdbcType="INTEGER" property="time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, draft_id, `time`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from notify_time
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectByDraftId" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+        notify_time
+      WHERE
+          draft_id = #{id}
+    </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    SELECT
+      *
+    FROM
+      notify_time
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from notify_time
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByDraftId">
+    delete from notify_time
+    where draft_id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.NotifyTime" useGeneratedKeys="true">
+    insert into notify_time (draft_id, `time`)
+    values (#{draftId,jdbcType=INTEGER}, #{time,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.NotifyTime" useGeneratedKeys="true">
+    insert into notify_time
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="draftId != null">
+        draft_id,
+      </if>
+      <if test="time != null">
+        `time`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="draftId != null">
+        #{draftId,jdbcType=INTEGER},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.NotifyTime">
+    update notify_time
+    <set>
+      <if test="draftId != null">
+        draft_id = #{draftId,jdbcType=INTEGER},
+      </if>
+      <if test="time != null">
+        `time` = #{time,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.NotifyTime">
+    update notify_time
+    set draft_id = #{draftId,jdbcType=INTEGER},
+      `time` = #{time,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByDraftId" parameterType="com.ly.pojo.NotifyTime">
+    update notify_time
+    set
+        `time` = #{time,jdbcType=INTEGER}
+    where draft_id = #{draftId,jdbcType=INTEGER}
+  </update>
+</mapper>

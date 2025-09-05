@@ -1,0 +1,27 @@
+{
+  "name": "easyenroll_front",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "element-plus": "^2.10.4",
+    "lodash": "^4.17.21",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.11",
+    "vue": "^3.3.4"
+  },
+  "overrides": {
+    "esbuild": "^0.18.20"
+  }
+}

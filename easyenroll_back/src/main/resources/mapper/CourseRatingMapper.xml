@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mapper.CourseRatingMapper">
+  <resultMap id="BaseResultMap" type="com.ly.pojo.CourseRating">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode" />
+    <result column="rating" jdbcType="DOUBLE" property="rating" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, course_name, course_code, rating
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from course_rating
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+      SELECT
+          *
+      FROM
+          course_rating
+    </select>
+    <select id="selectByCourseCodeList" resultMap="BaseResultMap">
+      SELECT *
+      FROM
+        course_rating
+      <where>
+        <if test="courseCodeList != null and courseCodeList.size() > 0">
+          course_code IN
+          <foreach collection="courseCodeList" item="code" open="(" separator="," close=")">
+            #{code}
+          </foreach>
+        </if>
+        <if test="courseCodeList == null or courseCodeList.size() == 0">
+          1=0 <!-- 如果没有课程代码，返回空结果 -->
+        </if>
+      </where>
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from course_rating
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteAll">
+      DELETE FROM course_rating
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.CourseRating" useGeneratedKeys="true">
+    insert into course_rating (course_name, course_code, rating
+      )
+    values (#{courseName,jdbcType=VARCHAR}, #{courseCode,jdbcType=VARCHAR}, #{rating,jdbcType=DOUBLE}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ly.pojo.CourseRating" useGeneratedKeys="true">
+    insert into course_rating
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="courseName != null">
+        course_name,
+      </if>
+      <if test="courseCode != null">
+        course_code,
+      </if>
+      <if test="rating != null">
+        rating,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="courseName != null">
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="courseCode != null">
+        #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="rating != null">
+        #{rating,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ly.pojo.CourseRating">
+    update course_rating
+    <set>
+      <if test="courseName != null">
+        course_name = #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="courseCode != null">
+        course_code = #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="rating != null">
+        rating = #{rating,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ly.pojo.CourseRating">
+    update course_rating
+    set course_name = #{courseName,jdbcType=VARCHAR},
+      course_code = #{courseCode,jdbcType=VARCHAR},
+      rating = #{rating,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
