@@ -67,6 +67,8 @@
 4.  使用NatApp进行外网穿透
 5.  在支付宝开发平台注册沙箱应用，去拿到相关的公钥、私钥、APPID
 
+ **注意：**本系统使用了ai模型，应该将一个onnx文件加入到easyenroll_back/src/main/resource/model/目录下，但是由于文件太大（超过100MB），无法上传。 大家可以在ai-model/目录下通过train.py生成文件夹“course_load_model”，再通过convert_to_onnx.py将文件夹“course_load_model”转化为“course_load_model.onnx”，将该文件放在easyenroll_back/src/main/resource/model/目录下
+
 
 #### 参与贡献
 
