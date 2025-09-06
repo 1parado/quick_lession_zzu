@@ -12,6 +12,7 @@ cmd
 127.0.0.1:9876(name-server)
 start mqnamesrv.cmd
 start mqbroker.cmd -n 127.0.0.1:9876 -c ../conf/broker.conf
+（详细的broker.conf见“文档”文件夹）
 
 
 在https://natapp.cn/tunnel/lists页面购买免费隧道（三天期限）（8088）
