@@ -1,0 +1,36 @@
+启动Mysql 
+127.0.0.1:3306
+
+
+启动Redis
+192.168.173.128:6379
+
+
+启动RabbitMQ
+E:\Work\Study\JavaStudy\JavaFramework\RocketMQStudy\rocketmq-all-5.3.3-bin-release\rocketmq-all-5.3.3-bin-release\bin
+cmd
+127.0.0.1:9876(name-server)
+start mqnamesrv.cmd
+start mqbroker.cmd -n 127.0.0.1:9876 -c ../conf/broker.conf
+
+
+在https://natapp.cn/tunnel/lists页面购买免费隧道（三天期限）（8088）
+
+​	修改代码中（PayUtil.java）的 NOTIFY_URL 为 新的域名（隧道中）
+
+​	修改NATAPP文件夹的start.bat文件内容中的 natapp.exe -authtoken 为 新的值（隧道中）
+
+
+
+启动NATAPP外网穿透
+
+​	双击start.bat启动
+​	
+
+​启动前端dev	5173
+
+​启动后端back	8088
+
+​启动后端sms	8089
+
+​启动后端user	8090
