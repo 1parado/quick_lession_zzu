@@ -38,4 +38,8 @@ public interface SelectionsMapper {
     List<Integer> selectStudentIdsByCourseId(Integer courseId);
 
     List<Integer> selectCourseIdsByStudentId(Integer studentId);
+
+    List<Integer> selectCourseIdsByStudentIds(List<Integer> studentIds);
+
+    Integer selectCountByCourseId(Integer id);
 }

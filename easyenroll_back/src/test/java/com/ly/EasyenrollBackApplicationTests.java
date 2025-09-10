@@ -4,14 +4,20 @@ import com.ly.util.SimpleTokenBucket;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 class EasyenrollBackApplicationTests {
 
     public static void main(String[] args) throws InterruptedException {
-        contextLoads();
+        //contextLoads();
+
+
+
     }
+
+
 
     static void contextLoads() throws InterruptedException {
         // 测试令牌桶：容量2，每秒补充1个令牌

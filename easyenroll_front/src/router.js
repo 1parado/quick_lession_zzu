@@ -44,6 +44,7 @@ import ForumCourse from "./components/forum/ForumCourse.vue";
 import ForumPost from "./components/forum/ForumPost.vue";
 import ForumPublish from "./components/forum/ForumPublish.vue";
 import ForumCourseGroup from "./components/forum/ForumCourseGroup.vue";
+import AIChat from "./components/ai/AIChat.vue";
 
 
 const routes = [
@@ -111,6 +112,10 @@ const routes = [
             { path: 'forumPublish', component: ForumPublish, meta: { requiresAuth: true} },
             { path: 'forumCourseGroup', component: ForumCourseGroup, meta: { requiresAuth: true} },
         ]
+    }, {
+        path: '/aiChat',
+        component: AIChat,
+        meta: { requiresAuth: true },
     }
 ]
 

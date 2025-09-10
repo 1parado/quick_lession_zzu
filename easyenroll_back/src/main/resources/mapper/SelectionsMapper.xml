@@ -179,5 +179,25 @@
         student_id = #{studentId}
 
   </select>
+  <select id="selectCourseIdsByStudentIds" resultType="java.lang.Integer">
+    SELECT
+        course_id
+    FROM
+        selections
+    WHERE
+        student_id IN
+        <foreach collection="studentIds" separator="," open="(" close=")" item="studentId">
+            #{studentId}
+        </foreach>
+
+  </select>
+  <select id="selectCountByCourseId" resultType="java.lang.Integer">
+    SELECT
+        count(*)
+    FROM
+        selections
+    WHERE
+        course_id = #{id}
+  </select>
 
 </mapper>

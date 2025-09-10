@@ -34,4 +34,6 @@ public interface SelectionService {
     List<CoursesPO> getTeacherCourseByNormalNoPage(Long tno);
 
     List<CoursesPO> getCourseByNormalFull(Integer studentId);
+
+    String getRelatedCoursesStats(String courseName);
 }

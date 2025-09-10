@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -352,5 +353,55 @@ public class SelectionServiceImpl implements SelectionService {
 
         }
         return i == 1 ? 1 : 0;
+    }
+
+    public String getRelatedCoursesStats(String courseName) {
+        //DESC limit 10
+        //根据课程名字，找到相关课程名字，选择人数。
+        //先根据课程名字查询课程id
+        Integer courseId = coursesMapper.selectIdByCourseName(courseName);
+        //根据课程id，查询学生id列表
+        List<Integer> studentIds = selectionsMapper.selectStudentIdsByCourseId(courseId);
+        //根据学生id列表，查询对应的所有课程id列表
+        List<Integer> courseIds = selectionsMapper.selectCourseIdsByStudentIds(studentIds);
+        //对列表中的每一个课程id，查询它的选择数，维护起来
+        //对课程id转换为课程名字
+
+        List<Map<String, Integer>> results = new ArrayList<>();
+
+        int limit = 10;
+        for (Integer id : courseIds) {
+            if (limit == 0) {
+                break;
+            }
+            limit--;
+            Integer count = selectionsMapper.selectCountByCourseId(id);
+            String name = coursesMapper.selectCourseNameById(id);
+            Map<String, Integer> map = new HashMap<>();
+            map.put(name, count);
+            results.add(map);
+        }
+
+        //排序List
+        results.sort((mapA, mapB) -> {
+            Integer valueA = mapA.values().iterator().next();
+            Integer valueB = mapB.values().iterator().next();
+            return valueB.compareTo(valueA);
+        });
+
+        if (results.isEmpty()) {
+            return "目前没有关于《" + courseName + "》的选课关联数据。";
+        }
+        // 将查询结果格式化成易读的文本，作为给AI的上下文
+        return results.stream()
+                .map(row -> {
+                    // 获取Map中的第一个（也是唯一一个）键值对
+                    Map.Entry<String, Integer> entry = row.entrySet().iterator().next();
+                    return String.format("《%s》(%d人选择)",
+                            entry.getKey(),
+                            entry.getValue());
+                })
+                .collect(Collectors.joining("\n"));
+
     }
 }

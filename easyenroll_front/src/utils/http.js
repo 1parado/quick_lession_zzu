@@ -29,20 +29,41 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
     response => {
-        if (response.data.code === 401 || response.data.code === 402 ) {
-            window.alert(response.data.message);
-            sessionStorage.removeItem('token')
-            //去重新登录
-            router.push('/login')
-        }
-        return response
+        // 请求成功的处理
+        return response;
     },
-    (error) => {
-        // 对响应错误做统一处理（如 401 跳转登录）
-        if (error.response.status === 401) {
-            // Token过期或无效，跳转到登录页
-            sessionStorage.removeItem('token')
-            router.push('/login')
+    error => {
+        // 修复这里：检查 error.response 是否存在
+        if (error.response) {
+            // 服务器返回了错误响应
+            const status = error.response.status;
+            const message = error.response.data?.message || '请求失败';
+
+            console.error(`请求错误 ${status}: ${message}`);
+
+            // 可以根据不同的状态码进行不同的处理
+            switch (status) {
+                case 401:
+                    console.error('未授权，请重新登录');
+                    break;
+                case 403:
+                    console.error('禁止访问');
+                    break;
+                case 404:
+                    console.error('请求的资源不存在');
+                    break;
+                case 500:
+                    console.error('服务器内部错误');
+                    break;
+                default:
+                    console.error('其他错误');
+            }
+        } else if (error.request) {
+            // 请求已发出但没有收到响应
+            console.error('网络错误，请检查网络连接');
+        } else {
+            // 其他错误
+            console.error('请求配置错误:', error.message);
         }
         return Promise.reject(error)
     }

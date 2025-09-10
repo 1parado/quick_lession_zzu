@@ -71,4 +71,8 @@ public interface CoursesMapper {
     List<String> selectCourseCodeByTeacherId(Integer teacherId, int count);
 
     Courses selectByCourseCodeAndTeacherId(String code, Integer teacherId);
+
+    Integer selectIdByCourseName(String courseName);
+
+    String selectCourseNameById(Integer id);
 }

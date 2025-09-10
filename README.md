@@ -8,6 +8,7 @@
 - **短信模块**：实现异步短信服务，通过两个子项目分别模拟短信运营商和接收端用户，基于RocketMQ异步发送短信，并通过WebSocket与用户建立长连接实现实时通信；
 - **论坛模块**：构建基础论坛生态，支持发帖、回帖等基本功能，并集成简单的排行榜、留言板与评论区；
 - **AI智能负载评分**：基于Transformers库和Hugging Face生态系统，对中文预训练模型MacBERT进行微调，实现多类别文本分类功能，用于智能内容分析与评分。
+- **引入AI大模型（ollama）**：在服务器上部署本地大模型，并集成在项目中。微调模型，让后端服务能够与Ollama对话，理解业务数据。用于进行选课推荐问答。
 
 
 #### 软件架构
@@ -29,6 +30,8 @@
     论坛模块：提供发帖、评论、排行榜等基础社区功能
 
     AI评分服务：集成微调后的MacBERT模型进行文本分类和智能评分
+
+    AI大模型业务数据问答：集成微调后的ollama问答模型进行选课推荐问答
 
 3. 短信模拟运营商系统 (SpringBoot)
 
@@ -56,11 +59,25 @@
 
 #### 使用说明
 
+<<<<<<< HEAD
     详细请查看 文档/quickStart.txt
 
  **注意：** 本系统使用了支付宝沙箱模拟真实支付环境，所以需要在支付宝开发平台注册沙箱应用，去拿到相关的公钥、私钥、APPID
 
  **注意：** 本系统使用了ai模型，应该将一个onnx文件加入到easyenroll_back/src/main/resource/model/目录下，但是由于文件太大（超过100MB），无法上传。 大家可以在ai-model/目录下通过train.py生成文件夹“course_load_model”，再通过convert_to_onnx.py将文件夹“course_load_model”转化为“course_load_model.onnx”，将该文件放在easyenroll_back/src/main/resource/model/目录下
+=======
+1.  启动Mysql 
+    127.0.0.1:3306（本机）
+2.  启动Redis
+    192.168.173.128:6379 （虚拟机）
+3.  启动RocketMQ
+    进入RocketMQ的bin目录
+    start mqnamesrv.cmd （启动NameServer）
+    start mqbroker.cmd -n 127.0.0.1:9876 -c ../conf/broker.conf （启动Broker）（详细的broker.conf见“文档”文件夹）
+4.  使用NatApp进行外网穿透
+5.  在支付宝开发平台注册沙箱应用，去拿到相关的公钥、私钥、APPID
+6.  启动ollama服务
+>>>>>>> 917f50a (更新AI大模型)
 
 
 #### 参与贡献
@@ -109,3 +126,5 @@
 ![短信监控](image-sms.png)
 
 ![手机用户接收短信模拟](image-user.png)
+
+![AI大模型问答](image-aiChat.png)

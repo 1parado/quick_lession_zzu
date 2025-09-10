@@ -221,9 +221,22 @@
         AND
           course_code = #{code}
     </select>
+    <select id="selectIdByCourseName" resultType="java.lang.Integer">
+      SELECT id
+      FROM courses
+      WHERE name = #{courseName}
+    </select>
+  <select id="selectCourseNameById" resultType="java.lang.String">
+    SELECT
+        name
+    FROM
+        courses
+    WHERE
+        id = #{id}
+  </select>
 
 
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from courses
     where id = #{id,jdbcType=INTEGER}
   </delete>

@@ -26,6 +26,13 @@ spring:
           min-idle: 0
           max-wait: -1ms
 
+  ai:
+    ollama:
+      base-url: http://localhost:11434 # Ollama默认地址
+      chat:
+        options:
+          model: qwen2:7b # 拉取的模型名称
+
 # MyBatis
 mybatis:
   mapper-locations: classpath*:/mapper/**/*.xml
