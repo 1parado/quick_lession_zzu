@@ -107,10 +107,6 @@
 
 ![支付宝沙箱支付](image-studentPay.png)
 
-![管理端主页](image-admin.png)
-
-![教师端成绩管理](image-teacherGrade.png)
-
 ![论坛主页](image-forum.png)
 
 ![贴子详情](image-furomPost.png)
