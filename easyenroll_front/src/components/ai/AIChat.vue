@@ -50,27 +50,119 @@ const sendMessage = async () => {
 </script>
 
 <style scoped>
+.ai-chat {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 24px;
+}
+
 .chat-box {
-  height: 300px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
+  flex: 1;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
   overflow-y: auto;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
+
+.message {
+  padding: 12px 16px;
+  border-radius: 18px;
+  max-width: 80%;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
 .message.user {
-  text-align: right;
-  color: blue;
+  align-self: flex-end;
+  background: #007bff;
+  color: white;
+  border-bottom-right-radius: 4px;
 }
+
 .message.assistant {
-  text-align: left;
-  color: green;
+  align-self: flex-start;
+  background: #f1f3f5;
+  color: #333;
+  border-bottom-left-radius: 4px;
 }
+
 .input-area {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  align-items: center;
 }
+
 input {
   flex-grow: 1;
-  padding: 8px;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 24px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+button {
+  padding: 14px 24px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* 滚动条样式 */
+.chat-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>

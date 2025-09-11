@@ -1,6 +1,7 @@
 <template>
   <el-input v-model="searchText" style="width: 240px;margin-bottom: 30px" placeholder="请输入课程名" />
   <el-button style="margin-left: 20px;margin-bottom: 30px" type="primary" @click="searchCourse()" round>搜索</el-button>
+  <el-button style="margin-left: 1200px;margin-bottom: 30px; width: 100px" plain type="primary" @click="router.push('/aiChat')" round>问AI</el-button>
   <el-table :data="courseTableData" stripe style="width: 100%" v-loading="vloading" v-if="courseTableData.length > 0">
     <el-table-column prop="name" label="课程名" wixdth="180" />
     <el-table-column prop="courseCode" label="课程代码" wixdth="180" />
@@ -100,6 +101,7 @@
 import {onMounted, ref} from "vue";
 import axios from '../utils/http.js';
 import {ElMessage, ElPagination} from 'element-plus';
+import router from "../router";
 
 //搜索框的输入内容
 const searchText = ref('');
