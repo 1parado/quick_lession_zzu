@@ -11,6 +11,7 @@
             width: 100%;
             padding-right: 20px;
   ">
+          <div class="btn" @click="router.push('/aiChat')">问问AI</div>&nbsp;&nbsp;&nbsp;&nbsp;
           <div class="btn" @click="router.push('/forumHomepage')">论坛主页</div>&nbsp;&nbsp;&nbsp;&nbsp;
           <div class="btn" @click="router.push('/forumHomepage/forumCourseList')">课程列表</div>&nbsp;&nbsp;&nbsp;&nbsp;
           <div class="btn" @click="publishPost()">我要发帖</div>&nbsp;&nbsp;&nbsp;&nbsp;
